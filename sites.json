@@ -1,6 +1,6 @@
 {
   "prod": [
-    { "name": "nft-orderbook##", "path": "/art-house/Prod/nft-orderbook/", "description": "Sonic NFT orderbook" },
+    { "name": "nft-orderbook", "path": "/art-house/Prod/nft-orderbook/", "description": "Sonic NFT orderbook" },
     { "name": "art-house", "path": "/Prod/art-house/", "description": "NFT marketplace" }
   ],
   "testnet": [
