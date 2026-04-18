@@ -5,6 +5,6 @@
   ],
   "testnet": [
     { "name": "nft-orderbook", "path": "/Testnet/nft-orderbook/", "description": "Testing environment for Sonic NFT orderbook" },
-    { "name": "art-house", "path": "/Testnet/art-house/", "description": "Testing environment for NFT marketplace" }
+    { "name": "art-house", "path": "/Testnet/nft-marketplace/", "description": "Testing environment for NFT marketplace" }
   ]
 }
