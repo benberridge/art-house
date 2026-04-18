@@ -391,6 +391,30 @@
       /* keep toggle from overlapping on small screens */
       #theme-toggle { right: calc(var(--gap) + 110px); }
     }
+
+/* ============================================================
+   Banner locked to dark mode (ignores light theme)
+   ============================================================ */
+.top-banner {
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.55),
+    rgba(0,0,0,0.35)
+  ) !important;
+
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  color: #e0e0e0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+}
+
+.top-banner .ticker,
+.top-banner .stat-pill {
+  color: #e0e0e0;
+}
+
+.top-banner .stat-pill.warn {
+  border-color: rgba(255,207,90,0.30);
+}
   </style>
 </head>
 
