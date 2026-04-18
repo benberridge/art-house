@@ -227,7 +227,8 @@
     #theme-toggle {
       position: fixed;
       top: calc(var(--banner-h) + 8px);
-      right: calc(var(--gap) + 132px);
+      left: var(--gap);
+      right: auto;
       width: 42px;
       height: 42px;
       border-radius: 999px;
@@ -389,7 +390,7 @@
       body { padding-top: calc(var(--banner-h) + 12px); }
 
       /* keep toggle from overlapping on small screens */
-      #theme-toggle { right: calc(var(--gap) + 110px); }
+      #theme-toggle { left: var(--gap); }
     }
 
 /* ============================================================
