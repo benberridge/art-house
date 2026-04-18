@@ -38,7 +38,7 @@
       color: var(--text);
       min-height: 100vh;
       padding: 3rem 1.5rem 4rem;
-      transition: background 0.3s ease, color 0.3s ease;
+      transition: background 0.35s ease, color 0.35s ease;
     }
 
     /* =========================
@@ -48,19 +48,28 @@
       position: fixed;
       top: 1.25rem;
       right: 1.25rem;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
       background: var(--panel);
       border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.45rem 0.75rem;
-      border-radius: 999px;
+      display: grid;
+      place-items: center;
       cursor: pointer;
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      transition: background 0.25s ease, border-color 0.25s ease;
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     .theme-toggle:hover {
       border-color: var(--accent);
+    }
+
+    .theme-icon {
+      font-size: 1.1rem;
+      transition: transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.25s;
+    }
+
+    .theme-toggle.rotate .theme-icon {
+      transform: rotate(180deg) scale(1.15);
     }
 
     header {
@@ -141,11 +150,13 @@
 </head>
 
 <body>
-  <button class="theme-toggle" id="themeToggle">LIGHT</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <span class="theme-icon" id="themeIcon">🌙</span>
+  </button>
 
   <header>
     <h1>ART HOUSE</h1>
-    <p>Mainnet &amp; Testnet Environments</p>
+    <p>Mainnet & Testnet Environments</p>
   </header>
 
   <main>
@@ -166,24 +177,46 @@
 
   <script>
     /* =========================
-       THEME HANDLING
+       COOKIE HELPERS
     ========================== */
-    const toggleBtn = document.getElementById('themeToggle');
-    const root = document.documentElement;
-
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      root.setAttribute('data-theme', savedTheme);
-      toggleBtn.textContent = savedTheme === 'light' ? 'DARK' : 'LIGHT';
+    function setThemeCookie(value) {
+      document.cookie =
+        `theme=${value}; path=/; max-age=31536000; SameSite=Lax; domain=.${location.hostname.split('.').slice(-2).join('.')}`;
     }
 
-    toggleBtn.addEventListener('click', () => {
-      const current = root.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      root.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      toggleBtn.textContent = next === 'light' ? 'DARK' : 'LIGHT';
+    function getThemeCookie() {
+      return document.cookie
+        .split('; ')
+        .find(row => row.startsWith('theme='))
+        ?.split('=')[1];
+    }
+
+    /* =========================
+       THEME HANDLING
+    ========================== */
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeIcon');
+
+    const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    const savedTheme = getThemeCookie() || localStorage.getItem('theme');
+    const initialTheme = savedTheme || (systemPrefersLight ? 'light' : 'dark');
+
+    applyTheme(initialTheme);
+
+    toggle.addEventListener('click', () => {
+      toggle.classList.add('rotate');
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+      setTimeout(() => toggle.classList.remove('rotate'), 450);
     });
+
+    function applyTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      icon.textContent = theme === 'light' ? '☀️' : '🌙';
+      localStorage.setItem('theme', theme);
+      setThemeCookie(theme);
+    }
 
     /* =========================
        SITE LOADING
@@ -192,7 +225,6 @@
       try {
         const res = await fetch('/sites.json', { cache: 'no-store' });
         const data = await res.json();
-
         renderSection(data.prod || [], 'prod-grid');
         renderSection(data.testnet || [], 'testnet-grid');
       } catch (e) {
@@ -203,7 +235,6 @@
     function renderSection(items, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
-
       for (const site of items) {
         const card = document.createElement('div');
         card.className = 'card';
