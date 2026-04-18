@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <title>Art House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <link rel="icon" href="/favicon-32.png" />
 
   <style>
+    /* =========================
+       THEME VARIABLES
+    ========================== */
     :root {
       --bg: #0b0b14;
       --panel: #141420;
@@ -15,16 +17,50 @@
       --muted: #9a9ab0;
       --accent: #6cf0c2;
       --border: rgba(255,255,255,0.08);
+      --gradient-top: #151528;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f6fa;
+      --panel: #ffffff;
+      --text: #1a1a1a;
+      --muted: #5c5c6b;
+      --accent: #2bbd8c;
+      --border: rgba(0,0,0,0.08);
+      --gradient-top: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: radial-gradient(circle at top, #151528, var(--bg));
+      background: radial-gradient(circle at top, var(--gradient-top), var(--bg));
       color: var(--text);
       min-height: 100vh;
       padding: 3rem 1.5rem 4rem;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* =========================
+       THEME TOGGLE
+    ========================== */
+    .theme-toggle {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
     }
 
     header {
@@ -75,7 +111,7 @@
 
     .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
     }
 
     .card a {
@@ -87,7 +123,6 @@
     .card h3 {
       font-size: 1.05rem;
       margin-bottom: 0.35rem;
-      color: var(--text);
     }
 
     .card p {
@@ -106,9 +141,11 @@
 </head>
 
 <body>
+  <button class="theme-toggle" id="themeToggle">LIGHT</button>
+
   <header>
     <h1>ART HOUSE</h1>
-    <p>Mainnet & Testnet Environments</p>
+    <p>Mainnet &amp; Testnet Environments</p>
   </header>
 
   <main>
@@ -128,6 +165,29 @@
   </footer>
 
   <script>
+    /* =========================
+       THEME HANDLING
+    ========================== */
+    const toggleBtn = document.getElementById('themeToggle');
+    const root = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      root.setAttribute('data-theme', savedTheme);
+      toggleBtn.textContent = savedTheme === 'light' ? 'DARK' : 'LIGHT';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggleBtn.textContent = next === 'light' ? 'DARK' : 'LIGHT';
+    });
+
+    /* =========================
+       SITE LOADING
+    ========================== */
     async function loadSites() {
       try {
         const res = await fetch('/sites.json', { cache: 'no-store' });
