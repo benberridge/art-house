@@ -162,7 +162,7 @@
   <main>
     <section>
       <h2>Mainnet</h2>
-      <div class="grid" id="prod-grid"></div>
+      <div class="grid" id="Mainnet-grid"></div>
     </section>
 
     <section>
@@ -225,7 +225,7 @@
       try {
         const res = await fetch('/sites.json', { cache: 'no-store' });
         const data = await res.json();
-        renderSection(data.prod || [], 'prod-grid');
+        renderSection(data.Mainnet || [], 'Mainnet-grid');
         renderSection(data.testnet || [], 'testnet-grid');
       } catch (e) {
         console.error('Failed to load sites.json', e);
