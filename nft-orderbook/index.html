@@ -89,8 +89,14 @@
       }
 
       // Priority: cookie (cross-subdomain) -> localStorage -> system preference
-      const saved = getCookie(THEME_KEY) || localStorage.getItem(THEME_KEY);
-      const initial = saved || systemTheme();
+      const saved =
+        localStorage.getItem(THEME_KEY) ??
+        getCookie(THEME_KEY);
+
+      const initial =
+        saved === 'light' || saved === 'dark'
+          ? saved
+          : systemTheme();
 
       root.setAttribute("data-theme", initial);
       localStorage.setItem(THEME_KEY, initial);
