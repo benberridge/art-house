@@ -1,10 +1,10 @@
 {
   "Mainnet": [
     { "name": "nft-orderbook", "path": "/nft-orderbook/", "description": "Sonic NFT orderbook" },
-    { "name": "art-house", "path": "/nft-marketplace/", "description": "NFT marketplace" }
+    { "name": "nft-marketplace", "path": "/nft-marketplace/", "description": "NFT marketplace" }
   ],
   "testnet": [
     { "name": "nft-orderbook", "path": "/Testnet/nft-orderbook/", "description": "Testing environment for Sonic NFT orderbook" },
-    { "name": "art-house", "path": "/Testnet/nft-marketplace/", "description": "Testing environment for NFT marketplace" }
+    { "name": "nft-marketplace", "path": "/Testnet/nft-marketplace/", "description": "Testing environment for NFT marketplace" }
   ]
 }
