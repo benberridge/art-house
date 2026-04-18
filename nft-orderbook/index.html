@@ -230,23 +230,33 @@
     }
 
     /* Theme toggle (🌙 / ☀️) */
-    #theme-toggle {
-      position: fixed;
-      top: calc(var(--banner-h) + 8px);
-      left: var(--gap);
-      right: auto;
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      z-index: 1102;
-      backdrop-filter: blur(10px);
-      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
-    }
+#theme-toggle {
+  position: fixed;
+
+  /* same horizontal alignment as wallet */
+  right: var(--gap);
+  left: auto;
+
+  /* place BELOW the wallet button */
+  top: calc(
+    var(--banner-h) +        /* top banner */
+    8px +                    /* gap below banner */
+    42px +                   /* wallet button height */
+    8px                      /* spacing between buttons */
+  );
+
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 1102;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
     #theme-toggle:hover { border-color: var(--neon); }
     #theme-icon {
       font-size: 1.1rem;
@@ -396,7 +406,12 @@
       body { padding-top: calc(var(--banner-h) + 12px); }
 
       /* keep toggle from overlapping on small screens */
-      #theme-toggle { left: var(--gap); }
+      #theme-toggle 
+{
+    right: var(--gap);
+    left: auto;
+  }
+
     }
 
 /* ============================================================
