@@ -1,6 +1,6 @@
 {
   "Mainnet": [
-    { "name": "nft-orderbook", "path": "/Mainnet/nft-orderbook/", "description": "Sonic NFT orderbook" },
+    { "name": "nft-orderbook", "path": "/nft-orderbook/", "description": "Sonic NFT orderbook" },
     { "name": "art-house", "path": "/Mainnet/art-house/", "description": "NFT marketplace" }
   ],
   "testnet": [
