@@ -271,6 +271,51 @@
       color: var(--muted);
       font-size: 0.88rem;
     }
+
+    /* =========================
+       MOBILE SCREEN SUPPORT (from your reference HTML)
+       - slows ticker
+       - reduces padding / font sizes
+       - keeps toggle positioned cleanly
+    ========================== */
+    @media (max-width: 600px) {
+      /* Reference slows ticker animation on mobile */
+      .ticker-track {
+        animation-duration: 52s;
+      }
+
+      /* Reduce spacing so content fits comfortably */
+      body {
+        padding: 2rem 1rem 3rem;
+      }
+
+      header {
+        margin-bottom: 2rem;
+      }
+
+      header h1 {
+        font-size: 2.1rem;
+      }
+
+      header p {
+        font-size: 0.9rem;
+      }
+
+      main {
+        gap: 2rem;
+      }
+
+      /* Keep toggle from feeling cramped on small screens */
+      .theme-toggle {
+        top: 0.9rem;
+        right: 1rem;
+      }
+
+      /* Slightly tighter cards on small screens */
+      .card {
+        padding: 1.05rem 1.1rem;
+      }
+    }
   </style>
 </head>
 
@@ -435,8 +480,8 @@
     const nftTrackEl = document.getElementById('nftTickerTrack');
 
     function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, s => ({
-        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      return String(str).replace(/[&amp;&lt;&gt;"']/g, s => ({
+        '&amp;':'&amp;amp;','&lt;':'&amp;lt;','&gt;':'&amp;gt;','"':'&amp;quot;',"'":'&amp;#39;'
       }[s]));
     }
 
