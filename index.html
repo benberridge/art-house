@@ -156,7 +156,7 @@
 
   <header>
     <h1>ART HOUSE</h1>
-    <p>Mainnet &amp; Testnet Environments</p>
+    <p>Mainnet & Testnet Environments</p>
   </header>
 
   <main>
@@ -176,21 +176,6 @@
   </footer>
 
   <script>
-    /* =========================
-       OPTION B: SILENT DAPP PROBE (NO CONNECT)
-       - Read-only call to help some wallet browsers classify page as a dApp
-       - Does NOT request accounts (no eth_requestAccounts)
-    ========================== */
-    (function dappProbe() {
-      try {
-        const eth = window.ethereum;
-        if (!eth || typeof eth.request !== 'function') return;
-        eth.request({ method: 'eth_chainId' }).catch(() => {});
-      } catch (_) {
-        // best-effort only
-      }
-    })();
-
     /* =========================
        COOKIE HELPERS
     ========================== */
