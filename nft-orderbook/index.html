@@ -230,33 +230,33 @@
     }
 
     /* Theme toggle (🌙 / ☀️) */
-#theme-toggle {
-  position: fixed;
+    #theme-toggle {
+      position: fixed;
 
-  /* same horizontal alignment as wallet */
-  right: var(--gap);
-  left: auto;
+      /* same horizontal alignment as wallet */
+      right: var(--gap);
+      left: auto;
 
-  /* place BELOW the wallet button */
-  top: calc(
-    var(--banner-h) +        /* top banner */
-    8px +                    /* gap below banner */
-    42px +                   /* wallet button height */
-    8px                      /* spacing between buttons */
-  );
+      /* place BELOW the wallet button */
+      top: calc(
+        var(--banner-h) +        /* top banner */
+        8px +                    /* gap below banner */
+        42px +                   /* wallet button height */
+        8px                      /* spacing between buttons */
+      );
 
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  z-index: 1102;
-  backdrop-filter: blur(10px);
-  transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
-}
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      z-index: 1102;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+    }
     #theme-toggle:hover { border-color: var(--neon); }
     #theme-icon {
       font-size: 1.1rem;
@@ -264,6 +264,48 @@
     }
     #theme-toggle.rotate #theme-icon {
       transform: rotate(180deg) scale(1.15);
+    }
+
+    /* =========================
+       NEW: Home button next to theme toggle
+       - placed to the LEFT of the theme toggle
+    ========================== */
+    #home-button {
+      position: fixed;
+
+      /* same vertical position as theme toggle */
+      top: calc(
+        var(--banner-h) +
+        8px +
+        42px +
+        8px
+      );
+
+      /* sit left of theme toggle: gap + (theme width 42) + spacing */
+      right: calc(var(--gap) + 42px + 10px);
+
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      z-index: 1102;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      text-decoration: none;
+      color: var(--text-light);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    #home-button:hover {
+      border-color: var(--neon);
+      transform: translateY(-1px);
+    }
+    #home-button:active {
+      transform: translateY(0px);
     }
 
     #wallet-button {
@@ -405,38 +447,39 @@
       .ticker { animation-duration: 52s; font-size: 0.85rem; }
       body { padding-top: calc(var(--banner-h) + 12px); }
 
-      /* keep toggle from overlapping on small screens */
-      #theme-toggle 
-{
-    right: var(--gap);
-    left: auto;
-  }
-
+      /* keep buttons aligned on small screens */
+      #theme-toggle {
+        right: var(--gap);
+        left: auto;
+      }
+      #home-button {
+        right: calc(var(--gap) + 42px + 10px);
+      }
     }
 
-/* ============================================================
-   Banner locked to dark mode (ignores light theme)
-   ============================================================ */
-.top-banner {
-  background: linear-gradient(
-    90deg,
-    rgba(0,0,0,0.55),
-    rgba(0,0,0,0.35)
-  ) !important;
+    /* ============================================================
+       Banner locked to dark mode (ignores light theme)
+       ============================================================ */
+    .top-banner {
+      background: linear-gradient(
+        90deg,
+        rgba(0,0,0,0.55),
+        rgba(0,0,0,0.35)
+      ) !important;
 
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-  color: #e0e0e0;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.45);
-}
+      border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+      color: #e0e0e0;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+    }
 
-.top-banner .ticker,
-.top-banner .stat-pill {
-  color: #e0e0e0;
-}
+    .top-banner .ticker,
+    .top-banner .stat-pill {
+      color: #e0e0e0;
+    }
 
-.top-banner .stat-pill.warn {
-  border-color: rgba(255,207,90,0.30);
-}
+    .top-banner .stat-pill.warn {
+      border-color: rgba(255,207,90,0.30);
+    }
   </style>
 </head>
 
@@ -455,6 +498,11 @@
   </div>
 
   <div class="brand">NFT Orderbook</div>
+
+  <!-- NEW: Home button (🏠) next to theme toggle -->
+  <a id="home-button" href="https://art-house.xyz/" aria-label="Home">
+    🏠
+  </a>
 
   <!-- Animated theme toggle (🌙 / ☀️) -->
   <button id="theme-toggle" aria-label="Toggle theme">
