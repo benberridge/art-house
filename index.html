@@ -57,6 +57,7 @@
       place-items: center;
       cursor: pointer;
       transition: background 0.3s ease, border-color 0.3s ease;
+      z-index: 10;
     }
 
     .theme-toggle:hover {
@@ -146,6 +147,132 @@
       font-size: 0.75rem;
       color: var(--muted);
     }
+
+    /* =========================
+       ACTIVE NFT'S TICKER (MAINNET)
+    ========================== */
+    .ticker-wrap {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+
+    .ticker-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .ticker-title {
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .ticker-status {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .ticker {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.12);
+    }
+
+    [data-theme="light"] .ticker {
+      background: rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .ticker::before,
+    .ticker::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 48px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .ticker::before {
+      left: 0;
+      background: linear-gradient(90deg, rgba(11,11,20,0.85), rgba(11,11,20,0));
+    }
+
+    .ticker::after {
+      right: 0;
+      background: linear-gradient(270deg, rgba(11,11,20,0.85), rgba(11,11,20,0));
+    }
+
+    [data-theme="light"] .ticker::before {
+      background: linear-gradient(90deg, rgba(245,246,250,0.95), rgba(245,246,250,0));
+    }
+    [data-theme="light"] .ticker::after {
+      background: linear-gradient(270deg, rgba(245,246,250,0.95), rgba(245,246,250,0));
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem 0.9rem;
+      white-space: nowrap;
+      will-change: transform;
+      animation: marquee var(--marquee-duration, 30s) linear infinite;
+    }
+
+    .ticker:hover .ticker-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    [data-theme="light"] .ticker-item {
+      background: rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .ticker-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108,240,194,0.12);
+    }
+
+    .ticker-empty {
+      padding: 0.75rem 0.9rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
   </style>
 </head>
 
@@ -156,12 +283,26 @@
 
   <header>
     <h1>ART HOUSE</h1>
-    <p>Mainnet & Testnet Environments</p>
+    <p>Mainnet &amp; Testnet Environments</p>
   </header>
 
   <main>
     <section>
       <h2>Mainnet</h2>
+
+      <!-- ACTIVE NFT'S banner (scrolling ticker) -->
+      <div class="ticker-wrap" aria-label="Active NFT collections">
+        <div class="ticker-header">
+          <div class="ticker-title">ACTIVE NFT'S</div>
+          <div class="ticker-status" id="nftStatus">Loading onchain collections…</div>
+        </div>
+        <div class="ticker" role="region" aria-label="Active NFTs scrolling banner">
+          <div class="ticker-track" id="nftTickerTrack">
+            <div class="ticker-empty">Loading…</div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid" id="Mainnet-grid"></div>
     </section>
 
@@ -175,13 +316,18 @@
     © Art House
   </footer>
 
+  <!-- Ethers.js (browser) -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+
   <script>
     /* =========================
        COOKIE HELPERS
     ========================== */
     function setThemeCookie(value) {
-      document.cookie =
-        `theme=${value}; path=/; max-age=31536000; SameSite=Lax; domain=.${location.hostname.split('.').slice(-2).join('.')}`;
+      const baseDomain = location.hostname.split('.').slice(-2).join('.');
+      // Avoid invalid domain attribute on localhost/dev
+      const domainPart = (location.hostname.includes('.') ? `; domain=.${baseDomain}` : '');
+      document.cookie = `theme=${value}; path=/; max-age=31536000; SameSite=Lax${domainPart}`;
     }
 
     function getThemeCookie() {
@@ -248,7 +394,106 @@
       }
     }
 
+    /* =========================
+       ONCHAIN: ACTIVE NFT'S TICKER (MAINNET)
+    ========================== */
+    const CONTRACT_ADDRESS = "0x3eB04112393e5Ea3A04B70d887589F5e8c4c65b4";
+
+    // Full ABI as provided (used to call getCollections)
+    const CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"nftContract","type":"address"},{"indexed":false,"internalType":"string","name":"name","type":"string"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"}],"name":"CollectionRecorded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"minFee","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"feeBps","type":"uint256"}],"name":"FeesUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"FeesWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"offerId","type":"uint256"},{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":true,"internalType":"address","name":"nftContract","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint64","name":"withdrawnAt","type":"uint64"}],"name":"NFTWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"offerId","type":"uint256"},{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint64","name":"cancelledAt","type":"uint64"}],"name":"OfferCancelled","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"offerId","type":"uint256"},{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":true,"internalType":"address","name":"nftContract","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"fee","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"totalPaid","type":"uint256"},{"indexed":false,"internalType":"uint64","name":"createdAt","type":"uint64"},{"indexed":false,"internalType":"uint64","name":"expiry","type":"uint64"}],"name":"OfferCreated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"offerId","type":"uint256"},{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":true,"internalType":"address","name":"seller","type":"address"},{"indexed":false,"internalType":"address","name":"nftContract","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint64","name":"fulfilledAt","type":"uint64"}],"name":"OfferFulfilled","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"by","type":"address"}],"name":"Paused","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"by","type":"address"}],"name":"Unpaused","type":"event"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"calculateFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"offerId","type":"uint256"}],"name":"cancelOffer","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"collectedFees","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint64","name":"expirySeconds","type":"uint64"}],"name":"createOffer","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint64","name":"expirySeconds","type":"uint64"},{"internalType":"string","name":"collectionName","type":"string"}],"name":"createOffer","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"feeBps","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"offerId","type":"uint256"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"fulfilOffer","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"nftContractOrZero","type":"address"}],"name":"getActiveOffers","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"buyer","type":"address"}],"name":"getActiveOffersByBuyer","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"nftContract","type":"address"}],"name":"getActiveOffersByCollection","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"nftContractOrZero","type":"address"},{"internalType":"uint256","name":"start","type":"uint256"},{"internalType":"uint256","name":"count","type":"uint256"}],"name":"getActiveOffersRange","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"getCollection","outputs":[{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"string","name":"name","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getCollectionCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getCollections","outputs":[{"components":[{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"string","name":"name","type":"string"}],"internalType":"struct NFTOrderBook.CollectionEntry[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"start","type":"uint256"},{"internalType":"uint256","name":"count","type":"uint256"}],"name":"getCollectionsRange","outputs":[{"components":[{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"string","name":"name","type":"string"}],"internalType":"struct NFTOrderBook.CollectionEntry[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"offerId","type":"uint256"}],"name":"getOffer","outputs":[{"components":[{"internalType":"address","name":"buyer","type":"address"},{"internalType":"address","name":"seller","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"fee","type":"uint256"},{"internalType":"uint256","name":"totalPaid","type":"uint256"},{"internalType":"enum NFTOrderBook.Status","name":"status","type":"uint8"},{"internalType":"uint64","name":"createdAt","type":"uint64"},{"internalType":"uint64","name":"fulfilledAt","type":"uint64"},{"internalType":"uint64","name":"cancelledAt","type":"uint64"},{"internalType":"uint64","name":"withdrawnAt","type":"uint64"},{"internalType":"uint64","name":"expiry","type":"uint64"}],"internalType":"struct NFTOrderBook.Offer","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"offerId","type":"uint256"}],"name":"getOfferView","outputs":[{"components":[{"internalType":"address","name":"buyer","type":"address"},{"internalType":"address","name":"seller","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"fee","type":"uint256"},{"internalType":"uint256","name":"totalPaid","type":"uint256"},{"internalType":"enum NFTOrderBook.Status","name":"status","type":"uint8"},{"internalType":"uint64","name":"createdAt","type":"uint64"},{"internalType":"uint64","name":"fulfilledAt","type":"uint64"},{"internalType":"uint64","name":"cancelledAt","type":"uint64"},{"internalType":"uint64","name":"withdrawnAt","type":"uint64"},{"internalType":"uint64","name":"expiry","type":"uint64"}],"internalType":"struct NFTOrderBook.Offer","name":"o","type":"tuple"},{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"bool","name":"canBuyerCancel","type":"bool"},{"internalType":"bool","name":"canSellerFulfil","type":"bool"},{"internalType":"bool","name":"nftReadyToWithdraw","type":"bool"},{"internalType":"uint256","name":"timeToExpiry","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"buyer","type":"address"}],"name":"getOffersByBuyer","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"buyer","type":"address"},{"internalType":"uint256","name":"start","type":"uint256"},{"internalType":"uint256","name":"count","type":"uint256"}],"name":"getOffersByBuyerRange","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"nftContract","type":"address"}],"name":"getOffersByCollection","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"uint256","name":"start","type":"uint256"},{"internalType":"uint256","name":"count","type":"uint256"}],"name":"getOffersByCollectionRange","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"buyer","type":"address"}],"name":"getUserStats","outputs":[{"internalType":"uint256","name":"totalOffers","type":"uint256"},{"internalType":"uint256","name":"activeOffers","type":"uint256"},{"internalType":"uint256","name":"fulfilledOffers","type":"uint256"},{"internalType":"uint256","name":"cancelledOffers","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"minFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"nextOfferId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"offers","outputs":[{"internalType":"address","name":"buyer","type":"address"},{"internalType":"address","name":"seller","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"fee","type":"uint256"},{"internalType":"uint256","name":"totalPaid","type":"uint256"},{"internalType":"enum NFTOrderBook.Status","name":"status","type":"uint8"},{"internalType":"uint64","name":"createdAt","type":"uint64"},{"internalType":"uint64","name":"fulfilledAt","type":"uint64"},{"internalType":"uint64","name":"cancelledAt","type":"uint64"},{"internalType":"uint64","name":"withdrawnAt","type":"uint64"},{"internalType":"uint64","name":"expiry","type":"uint64"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"offersByBuyer","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"offersByCollection","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"}],"name":"onERC721Received","outputs":[{"internalType":"bytes4","name":"","type":"bytes4"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"paused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"buyer","type":"address"},{"internalType":"uint256","name":"maxAge","type":"uint256"}],"name":"pruneBuyerHistory","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"nftContract","type":"address"},{"internalType":"uint256","name":"maxAge","type":"uint256"}],"name":"pruneCollectionHistory","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_minFee","type":"uint256"},{"internalType":"uint256","name":"_feeBps","type":"uint256"}],"name":"setFees","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bool","name":"_paused","type":"bool"}],"name":"setPaused","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawFees","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"offerId","type":"uint256"}],"name":"withdrawNFT","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+
+    const nftStatusEl = document.getElementById('nftStatus');
+    const nftTrackEl = document.getElementById('nftTickerTrack');
+    const tickerRootEl = document.querySelector('.ticker-track');
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, s => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[s]));
+    }
+
+    async function getProvider() {
+      // Prefer injected wallet provider (read-only, no prompt)
+      if (window.ethereum) {
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        try {
+          const net = await browserProvider.getNetwork();
+          // If user is on a different chain, still allow fallback read from mainnet:
+          if (net && Number(net.chainId) !== 1) {
+            return new ethers.JsonRpcProvider("https://cloudflare-eth.com");
+          }
+        } catch (_) {
+          // if any issue, fallback
+          return new ethers.JsonRpcProvider("https://cloudflare-eth.com");
+        }
+        return browserProvider;
+      }
+      // Fallback public mainnet RPC
+      return new ethers.JsonRpcProvider("https://cloudflare-eth.com");
+    }
+
+    function renderTicker(names) {
+      const unique = Array.from(new Set(names.filter(Boolean).map(n => n.trim()).filter(n => n.length)));
+
+      if (!unique.length) {
+        nftStatusEl.textContent = "No collections recorded yet.";
+        nftTrackEl.innerHTML = `<div class="ticker-empty">No active NFT collections found.</div>`;
+        // Stop marquee animation when empty
+        nftTrackEl.style.animation = "none";
+        return;
+      }
+
+      nftStatusEl.textContent = `${unique.length} collection${unique.length === 1 ? '' : 's'} recorded`;
+
+      // Build items once
+      const itemsHtml = unique.map(name => `
+        <span class="ticker-item" title="${escapeHtml(name)}">
+          <span class="ticker-dot" aria-hidden="true"></span>
+          <span>${escapeHtml(name)}</span>
+        </span>
+      `).join('');
+
+      // Duplicate content to ensure seamless marquee (track moves -50%)
+      nftTrackEl.innerHTML = itemsHtml + itemsHtml;
+
+      // Tune duration roughly by content length
+      const roughLen = unique.join(' • ').length;
+      const duration = Math.min(80, Math.max(20, roughLen * 0.22)); // 20s..80s
+      nftTrackEl.style.setProperty('--marquee-duration', `${duration}s`);
+      nftTrackEl.style.animation = ""; // re-enable in case it was disabled
+    }
+
+    async function loadActiveNfts() {
+      nftStatusEl.textContent = "Loading onchain collections…";
+      nftTrackEl.innerHTML = `<div class="ticker-empty">Loading…</div>`;
+
+      try {
+        const provider = await getProvider();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+        const collections = await contract.getCollections();
+
+        // collections: array of tuples { nftContract, name }
+        const names = (collections || []).map(entry => {
+          // ethers v6 tuple can be accessed via entry.name OR entry[1]
+          return (entry && (entry.name ?? entry[1])) || "";
+        });
+
+        renderTicker(names);
+      } catch (err) {
+        console.error("Failed to load getCollections()", err);
+        nftStatusEl.textContent = "Failed to load onchain collections.";
+        nftTrackEl.innerHTML = `<div class="ticker-empty">Unable to fetch collections from mainnet.</div>`;
+        nftTrackEl.style.animation = "none";
+      }
+    }
+
+    // Load both sections
     loadSites();
+    loadActiveNfts();
+
+    // Optional: refresh ticker periodically (keeps banner up to date if new collections get recorded)
+    setInterval(loadActiveNfts, 60_000);
   </script>
 </body>
 </html>
