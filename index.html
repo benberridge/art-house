@@ -57,10 +57,11 @@
       place-items: center;
       cursor: pointer;
       transition: background 0.3s ease, border-color 0.3s ease;
-      z-index: 10;
     }
 
-    .theme-toggle:hover { border-color: var(--accent); }
+    .theme-toggle:hover {
+      border-color: var(--accent);
+    }
 
     .theme-icon {
       font-size: 1.1rem;
@@ -145,177 +146,6 @@
       font-size: 0.75rem;
       color: var(--muted);
     }
-
-    /* =========================
-       ACTIVE NFT'S TICKER (MAINNET)
-    ========================== */
-    .ticker-wrap {
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1rem 1.1rem;
-      margin-bottom: 1.25rem;
-      overflow: hidden;
-    }
-
-    .ticker-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 0.65rem;
-    }
-
-    .ticker-title {
-      font-size: 0.95rem;
-      letter-spacing: 0.12em;
-      color: var(--accent);
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .ticker-status {
-      font-size: 0.8rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .ticker {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(0,0,0,0.12);
-    }
-
-    [data-theme="light"] .ticker {
-      background: rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-
-    .ticker::before,
-    .ticker::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 48px;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .ticker::before {
-      left: 0;
-      background: linear-gradient(90deg, rgba(11,11,20,0.85), rgba(11,11,20,0));
-    }
-
-    .ticker::after {
-      right: 0;
-      background: linear-gradient(270deg, rgba(11,11,20,0.85), rgba(11,11,20,0));
-    }
-
-    [data-theme="light"] .ticker::before {
-      background: linear-gradient(90deg, rgba(245,246,250,0.95), rgba(245,246,250,0));
-    }
-    [data-theme="light"] .ticker::after {
-      background: linear-gradient(270deg, rgba(245,246,250,0.95), rgba(245,246,250,0));
-    }
-
-    .ticker-track {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.85rem;
-      padding: 0.75rem 0.9rem;
-      white-space: nowrap;
-      will-change: transform;
-      animation: marquee var(--marquee-duration, 34s) linear infinite;
-    }
-
-    .ticker:hover .ticker-track { animation-play-state: paused; }
-
-    @keyframes marquee {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    .ticker-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.35rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      font-size: 0.88rem;
-      color: var(--text);
-      max-width: 420px;
-    }
-
-    [data-theme="light"] .ticker-item {
-      background: rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.08);
-    }
-
-    .ticker-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px rgba(108,240,194,0.12);
-      flex: 0 0 auto;
-    }
-
-    .ticker-empty {
-      padding: 0.75rem 0.9rem;
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
-
-    /* =========================
-       MOBILE SCREEN SUPPORT (from your reference HTML)
-       - slows ticker
-       - reduces padding / font sizes
-       - keeps toggle positioned cleanly
-    ========================== */
-    @media (max-width: 600px) {
-      /* Reference slows ticker animation on mobile */
-      .ticker-track {
-        animation-duration: 52s;
-      }
-
-      /* Reduce spacing so content fits comfortably */
-      body {
-        padding: 2rem 1rem 3rem;
-      }
-
-      header {
-        margin-bottom: 2rem;
-      }
-
-      header h1 {
-        font-size: 2.1rem;
-      }
-
-      header p {
-        font-size: 0.9rem;
-      }
-
-      main {
-        gap: 2rem;
-      }
-
-      /* Keep toggle from feeling cramped on small screens */
-      .theme-toggle {
-        top: 0.9rem;
-        right: 1rem;
-      }
-
-      /* Slightly tighter cards on small screens */
-      .card {
-        padding: 1.05rem 1.1rem;
-      }
-    }
   </style>
 </head>
 
@@ -326,27 +156,12 @@
 
   <header>
     <h1>ART HOUSE</h1>
-    <p>Mainnet &amp; Testnet Environments</p>
+    <p>Mainnet & Testnet Environments</p>
   </header>
 
   <main>
     <section>
       <h2>Mainnet</h2>
-
-      <!-- ACTIVE NFT'S banner (scrolling ticker) -->
-      <div class="ticker-wrap" aria-label="Active NFT collections">
-        <div class="ticker-header">
-          <div class="ticker-title">ACTIVE NFT'S</div>
-          <div class="ticker-status" id="nftStatus">Loading onchain collections…</div>
-        </div>
-
-        <div class="ticker" role="region" aria-label="Active NFTs scrolling banner">
-          <div class="ticker-track" id="nftTickerTrack">
-            <div class="ticker-empty">Loading…</div>
-          </div>
-        </div>
-      </div>
-
       <div class="grid" id="Mainnet-grid"></div>
     </section>
 
@@ -362,43 +177,18 @@
 
   <script>
     /* =========================
-       COOKIE HELPERS (robust base-domain)
+       COOKIE HELPERS
     ========================== */
-    function getCookie(name) {
-      const m = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-      return m ? decodeURIComponent(m[2]) : null;
-    }
-
-    function baseDomain(host) {
-      if (!host || host === "localhost") return null;
-      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":")) return null;
-
-      const parts = host.split(".").filter(Boolean);
-      if (parts.length < 2) return null;
-
-      const last2 = parts.slice(-2).join(".");
-      const last3 = parts.slice(-3).join(".");
-
-      const sldTlds = new Set([
-        "co.uk","org.uk","ac.uk","gov.uk","net.uk",
-        "com.au","net.au","org.au",
-        "co.nz","com.br","co.jp"
-      ]);
-
-      if (sldTlds.has(last2) && parts.length >= 3) return last3;
-      return last2;
-    }
-
     function setThemeCookie(value) {
-      const base = baseDomain(location.hostname);
-      let cookie = `theme=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`;
-      if (location.protocol === "https:") cookie += "; Secure";
-      if (base) cookie += `; domain=.${base}`;
-      document.cookie = cookie;
+      document.cookie =
+        `theme=${value}; path=/; max-age=31536000; SameSite=Lax; domain=.${location.hostname.split('.').slice(-2).join('.')}`;
     }
 
     function getThemeCookie() {
-      return getCookie("theme");
+      return document.cookie
+        .split('; ')
+        .find(row => row.startsWith('theme='))
+        ?.split('=')[1];
     }
 
     /* =========================
@@ -425,7 +215,7 @@
       root.setAttribute('data-theme', theme);
       icon.textContent = theme === 'light' ? '☀️' : '🌙';
       localStorage.setItem('theme', theme);
-      try { setThemeCookie(theme); } catch {}
+      setThemeCookie(theme);
     }
 
     /* =========================
@@ -457,127 +247,7 @@
         container.appendChild(card);
       }
     }
-  </script>
 
-  <!-- Use ethers v5 ESM from jsDelivr (same pattern as your working reference page) -->
-  <script type="module">
-    import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.esm.min.js';
-
-    /* =========================
-       ONCHAIN: ACTIVE NFT'S TICKER (SONIC MAINNET)
-    ========================== */
-    const CONTRACT_ADDRESS = "0x3eB04112393e5Ea3A04B70d887589F5e8c4c65b4";
-    const SONIC_RPC = "https://rpc.soniclabs.com";
-
-    // We only need the read methods for the banner; keep it small and reliable
-    const ABI = [
-      "function getCollections() view returns (tuple(address nftContract,string name)[])",
-      "function getCollectionCount() view returns (uint256)",
-      "function getCollectionsRange(uint256 start,uint256 count) view returns (tuple(address nftContract,string name)[])"
-    ];
-
-    const nftStatusEl = document.getElementById('nftStatus');
-    const nftTrackEl = document.getElementById('nftTickerTrack');
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&amp;&lt;&gt;"']/g, s => ({
-        '&amp;':'&amp;amp;','&lt;':'&amp;lt;','&gt;':'&amp;gt;','"':'&amp;quot;',"'":'&amp;#39;'
-      }[s]));
-    }
-
-    function renderTicker(names) {
-      const unique = Array.from(new Set(
-        (names || [])
-          .filter(Boolean)
-          .map(n => n.trim())
-          .filter(n => n.length)
-      ));
-
-      if (!unique.length) {
-        nftStatusEl.textContent = "No collections recorded yet.";
-        nftTrackEl.innerHTML = `<div class="ticker-empty">No active NFT collections found.</div>`;
-        nftTrackEl.style.animation = "none";
-        return;
-      }
-
-      nftStatusEl.textContent = `${unique.length} collection${unique.length === 1 ? '' : 's'} recorded`;
-
-      const itemsHtml = unique.map(name => `
-        <span class="ticker-item" title="${escapeHtml(name)}">
-          <span class="ticker-dot" aria-hidden="true"></span>
-          <span>${escapeHtml(name)}</span>
-        </span>
-      `).join('');
-
-      // Duplicate for seamless loop (track moves -50%)
-      nftTrackEl.innerHTML = itemsHtml + itemsHtml;
-
-      // Adjust speed based on content length
-      const roughLen = unique.join(' • ').length;
-      const duration = Math.min(90, Math.max(24, roughLen * 0.22)); // 24s..90s
-      nftTrackEl.style.setProperty('--marquee-duration', `${duration}s`);
-      nftTrackEl.style.animation = ""; // ensure enabled
-    }
-
-    async function fetchCollectionsViaGetCollections(contract) {
-      // Preferred: direct getCollections()
-      const rows = await contract.getCollections();
-      return (rows || []).map(r => (r && r.name) ? String(r.name) : "");
-    }
-
-    async function fetchCollectionsViaPaging(contract) {
-      // Fallback: getCollectionCount + getCollectionsRange paging
-      const totalBN = await contract.getCollectionCount();
-      const total = totalBN.toNumber ? totalBN.toNumber() : Number(totalBN);
-
-      const PAGE = 200;
-      const names = [];
-
-      for (let start = 0; start < total; start += PAGE) {
-        const count = Math.min(PAGE, total - start);
-        const page = await contract.getCollectionsRange(start, count);
-        for (const item of (page || [])) {
-          const nm = item && item.name ? String(item.name).trim() : "";
-          if (nm) names.push(nm);
-        }
-      }
-      return names;
-    }
-
-    async function loadActiveNfts() {
-      nftStatusEl.textContent = "Loading onchain collections…";
-      nftTrackEl.innerHTML = `<div class="ticker-empty">Loading…</div>`;
-
-      try {
-        const provider = new ethers.providers.JsonRpcProvider(SONIC_RPC);
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-
-        let names = [];
-        try {
-          names = await fetchCollectionsViaGetCollections(contract);
-        } catch (e) {
-          // If getCollections() is not available / too heavy / reverts, use paging
-          console.warn("getCollections() failed, falling back to paging:", e);
-          names = await fetchCollectionsViaPaging(contract);
-        }
-
-        renderTicker(names);
-      } catch (err) {
-        console.error("Failed to load collections:", err);
-        nftStatusEl.textContent = "Unable to fetch collections from mainnet.";
-        nftTrackEl.innerHTML = `<div class="ticker-empty">Unable to fetch collections.</div>`;
-        nftTrackEl.style.animation = "none";
-      }
-    }
-
-    // Boot
-    loadActiveNfts();
-    // Refresh occasionally
-    setInterval(loadActiveNfts, 60_000);
-  </script>
-
-  <script>
-    // Boot sites.json after module has loaded (safe either way)
     loadSites();
   </script>
 </body>
