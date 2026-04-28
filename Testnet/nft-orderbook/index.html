@@ -17,8 +17,9 @@
     style-src 'self' https://fonts.googleapis.com 'unsafe-inline';
     font-src 'self' https://fonts.gstatic.com;
 
+      //RPCs = https://rpc.testnet.soniclabs.com or https://sonic-testnet-v2.drpc.org 
     connect-src 'self'
-      https://rpc.testnet.soniclabs.com
+      https://sonic-testnet-v2.drpc.org
       https://ipfs.io
       https://cloudflare-ipfs.com
       https://gateway.pinata.cloud
@@ -620,10 +621,11 @@
     // Deployed contract address (Sonic)
     const ESCROW_ADDRESS = "0x91B2b53B51A09bBf0C256D19Db78feE101F1c9B6";
 
-    // Sonic params
+    // Sonic mainnet params
+    //RPCs = https://rpc.testnet.soniclabs.com or https://sonic-testnet-v2.drpc.org
     const REQUIRED_CHAIN_ID = 14601;
     const SONIC_CHAIN_ID_HEX = '0x3909';
-    const SONIC_RPC = 'https://rpc.testnet.soniclabs.com';
+    const SONIC_RPC = 'https://sonic-testnet-v2.drpc.org';
 
     const ESCROW_ABI = [
       "function minFee() view returns (uint256)",
